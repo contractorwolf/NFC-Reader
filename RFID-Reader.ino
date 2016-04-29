@@ -23,6 +23,7 @@ BM019 reader(9, 10);
 
 
 void setup() {
+
   Serial.begin(9600);
   Serial.println("RFID Reader started");
   reader.Begin();
@@ -31,6 +32,9 @@ void setup() {
 
 
 void loop() {
+  
+
+
   
   if(reader.NFCReady == 0)
   {
@@ -42,7 +46,7 @@ void loop() {
   else
   {
     reader.CheckForTag();
-    delay(200);    
+    delay(100);    
   }  
 
 }
