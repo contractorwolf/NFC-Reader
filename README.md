@@ -3,5 +3,7 @@
 Here is the connection diagram:
 ![alt tag](http://blog.solutions-cubed.com/wp-content/uploads/2013/08/NFC_ARDUINO_UNO_SCHEMATIC.png)
 
-
 http://blog.solutions-cubed.com/wp-content/uploads/2013/08/NFC_ARDUINO_UNO_SCHEMATIC.png
+
+actual pictures:
+![alt tag](https://lh3.googleusercontent.com/0tRDcX-CBrBb4N3If8WRoZgacImim9RJR0TvVPQ_KnUOxGiCacLtEuFEO_WvQhzuAJAm-PhkG8ycUcXDXP-gXk7SYDqT6ScQqUMo27SHQzwAQ-TEvrPJ6FF8gxtK8i5Ut5o4ufgcM-BEJOGwMmRDSinRzu5it3gGD-95ayGPwiSmObLZV8-Q3Lv3-SwjCpwgJM9KiIqeabC431T9X-Aw8Wuo-_UpYQytKV1W0C3INE7Mr4LUcyAKl0j0ITQagPeEWzLMBTJvD_F2BKBuH0KG5zOnvZAswOGDwgIHC5RxRdkhOv5cMkbA5wWVsMb_d4lwH7wPwn14E5xK4EbT92hhidz3_wQ0OT93qt9L_U2KI31k4iNCh728iGmrX4OIGXYlCxH0g_8i7sNyOhsyLVnsoWQY9nV4-BE3HmU5E7rzEfpgUprFgopyGjqaAiJMLdF0mn0yiT9LjemSGVs8kzotBxfZtgxHwtkm25DPAKuxKbrb38IvLcCLnZLQRuOCppqYOCm2vRzkZhKFr7IDzCptgRt_q2KN6rCm0vtEDSan7GR7lL66fJ89-G9qh_sVmkiURM0ag35UoKa9o5_HeVsm3g=w1960-h1466-no)
