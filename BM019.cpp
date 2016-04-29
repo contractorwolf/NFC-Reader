@@ -1,9 +1,7 @@
 
 
 /*
-  Morse.cpp - Library for flashing Morse code.
-  Created by David A. Mellis, November 2, 2007.
-  Released into the public domain.
+  
 */
 
 
@@ -19,9 +17,6 @@ BM019::BM019(int IRQPin, int SSPin)
 
 void BM019::Begin(){
 
-    Serial.println("begin started"); 
-        Serial.println(_IRQPin); 
-        Serial.println(_SSPin); 
     NFCReady = 0;
     pinMode(_IRQPin, OUTPUT);
     digitalWrite(_IRQPin, HIGH); // Wake up pulse
@@ -46,11 +41,30 @@ void BM019::Begin(){
  
 }
 
+void flash(int times, int on_period){
+
+
+  int index = 0;
+
+
+  while(index<times){
+    digitalWrite(4, HIGH);
+    delay(50);
+    digitalWrite(4, LOW);
+    delay(on_period);
+    index++;
+  }
+ 
+}
 
 void BM019::Initialize()
 {
-  //Serial.println("initialize started"); 
   byte i = 0;
+
+  pinMode(3, OUTPUT);
+  pinMode(4, OUTPUT);
+  digitalWrite(3, LOW);
+  
 
 // step 1 send the command
   digitalWrite(_SSPin, LOW);
@@ -66,7 +80,6 @@ void BM019::Initialize()
 
   digitalWrite(_SSPin, LOW);
 
-  //Serial.println("initialize 1"); 
   while(RXBuffer[0] != 8)
     {
     RXBuffer[0] = SPI.transfer(0x03);  // Write 3 until
@@ -75,7 +88,6 @@ void BM019::Initialize()
   digitalWrite(_SSPin, HIGH);
   delay(1);
 
-        //Serial.println("initialize 2"); 
 // step 3, read the data
   digitalWrite(_SSPin, LOW);
   SPI.transfer(0x02);   // SPI control byte for read         
@@ -85,8 +97,6 @@ void BM019::Initialize()
       RXBuffer[i+2]=SPI.transfer(0);  // data
   digitalWrite(_SSPin, HIGH);
   delay(1);
-
-          //Serial.println("initialize 3"); 
 
   if ((RXBuffer[0] == 0) & (RXBuffer[1] == 15))
   {  
@@ -106,12 +116,14 @@ void BM019::Initialize()
     Serial.print(RXBuffer[RXBuffer[1]],HEX);
     Serial.print(RXBuffer[RXBuffer[1]+1],HEX);
     Serial.println(" ");
+
+    flash(4,100);
+  
   }
-  else
+  else{
     Serial.println("BAD RESPONSE TO IDN COMMAND!");
-
-
-        Serial.println("initialize 4"); 
+    flash(8,500);
+  }
 
   Serial.println(" ");
 }
@@ -163,11 +175,15 @@ void BM019::SetProtocol()
   {
      Serial.println("PROTOCOL SET-");  //
      NFCReady = 1; // NFC is ready
+     flash(2,1000);
   }
   else
   {
      Serial.println("BAD RESPONSE TO SET PROTOCOL");
      NFCReady = 0; // NFC not ready
+
+     flash(1,3000);
+     
   }
   Serial.println(" ");
 }
@@ -232,12 +248,14 @@ void BM019::CheckForTag()
       Serial.print(" ");
     }
     Serial.println(" ");
+    digitalWrite(4, HIGH);
   }
   else
     {
     Serial.print("NO TAG IN RANGE - ");
     Serial.print("RESPONSE CODE: ");
     Serial.println(RXBuffer[0],HEX);
+    digitalWrite(4, LOW);
     }
   Serial.println(" ");
 }
