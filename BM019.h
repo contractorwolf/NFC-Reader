@@ -13,7 +13,7 @@
 class BM019
 {
   public:
-    BM019(int IRQPin, int SSPin);
+    BM019(int IRQPin, int SSPin, int LEDPin, int LEDGNDPin, int RelayPin);
     void Begin();
     void Initialize();
     void SetProtocol();
@@ -21,8 +21,12 @@ class BM019
     byte NFCReady;  // used to track NFC state
     
   private:
-    int _SSPin;  // Slave Select pin
-    int _IRQPin;  // Sends wake-up pulse
+    void Flash(int times, int on_period); 
+    int _SSPin;           // Slave Select pin
+    int _IRQPin;          // Sends wake-up pulse
+    int _LEDPin;           // pin attached to LED 
+    int _LEDGNDPin;
+    int _RelayPin;         // pin attached to digital relay
     byte TXBuffer[40];    // transmit buffer
     byte RXBuffer[40];    // receive buffer
 

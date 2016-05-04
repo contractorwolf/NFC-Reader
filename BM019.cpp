@@ -8,10 +8,14 @@
 #include "BM019.h"
 
 
-BM019::BM019(int IRQPin, int SSPin)
+BM019::BM019(int IRQPin, int SSPin, int LEDPin, int LEDGNDPin, int RelayPin)
 {
    _IRQPin = IRQPin;
    _SSPin = SSPin;
+   _LEDPin = LEDPin;
+   _RelayPin = RelayPin;
+   _LEDGNDPin = LEDGNDPin;
+   
 }
 
 
@@ -41,16 +45,13 @@ void BM019::Begin(){
  
 }
 
-void flash(int times, int on_period){
-
-
+void BM019::Flash(int times, int on_period){
   int index = 0;
-
-
+  
   while(index<times){
-    digitalWrite(4, HIGH);
+    digitalWrite(_LEDPin, HIGH);
     delay(50);
-    digitalWrite(4, LOW);
+    digitalWrite(_LEDPin, LOW);
     delay(on_period);
     index++;
   }
@@ -61,9 +62,15 @@ void BM019::Initialize()
 {
   byte i = 0;
 
-  pinMode(3, OUTPUT);
-  pinMode(4, OUTPUT);
-  digitalWrite(3, LOW);
+
+  pinMode(_RelayPin, OUTPUT);
+
+  pinMode(_LEDPin, OUTPUT);
+  pinMode(_LEDGNDPin, OUTPUT);
+  
+  digitalWrite(_LEDPin, LOW);
+  digitalWrite(_LEDGNDPin, LOW);
+  
   
 
 // step 1 send the command
@@ -117,12 +124,12 @@ void BM019::Initialize()
     Serial.print(RXBuffer[RXBuffer[1]+1],HEX);
     Serial.println(" ");
 
-    flash(4,100);
+    Flash(4,100);
   
   }
   else{
     Serial.println("BAD RESPONSE TO IDN COMMAND!");
-    flash(8,500);
+    Flash(8,500);
   }
 
   Serial.println(" ");
@@ -175,14 +182,14 @@ void BM019::SetProtocol()
   {
      Serial.println("PROTOCOL SET-");  //
      NFCReady = 1; // NFC is ready
-     flash(2,1000);
+     Flash(2,500);
   }
   else
   {
      Serial.println("BAD RESPONSE TO SET PROTOCOL");
      NFCReady = 0; // NFC not ready
 
-     flash(1,3000);
+     Flash(1,3000);
      
   }
   Serial.println(" ");
@@ -241,21 +248,27 @@ void BM019::CheckForTag()
   if (RXBuffer[0] == 128)
   {  
     Serial.println("TAG DETECTED");
+
+    /*
     Serial.print("UID: ");
     for(i=11;i>=4;i--)
     {
       Serial.print(RXBuffer[i],HEX);
       Serial.print(" ");
     }
+    */
     Serial.println(" ");
-    digitalWrite(4, HIGH);
+    digitalWrite(_RelayPin, HIGH);
+    digitalWrite(_LEDPin, HIGH);
   }
   else
     {
-    Serial.print("NO TAG IN RANGE - ");
-    Serial.print("RESPONSE CODE: ");
-    Serial.println(RXBuffer[0],HEX);
-    digitalWrite(4, LOW);
+    Serial.print("NO TAG IN RANGE");
+    //Serial.print("RESPONSE CODE: ");
+    //Serial.println(RXBuffer[0],HEX);
+    digitalWrite(_RelayPin, LOW);
+    digitalWrite(_LEDPin, LOW);
+    
     }
   Serial.println(" ");
 }

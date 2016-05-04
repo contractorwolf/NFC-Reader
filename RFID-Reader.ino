@@ -19,11 +19,10 @@ Wiring:
 // the sensor communicates using SPI, so include the library:
 
 
-BM019 reader(9, 10);
+BM019 reader(9, 10,5,6,4);
 
 
 void setup() {
-
   Serial.begin(9600);
   Serial.println("RFID Reader started");
   reader.Begin();
@@ -32,9 +31,6 @@ void setup() {
 
 
 void loop() {
-  
-
-
   
   if(reader.NFCReady == 0)
   {
