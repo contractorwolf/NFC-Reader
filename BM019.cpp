@@ -8,14 +8,16 @@
 #include "BM019.h"
 
 
-BM019::BM019(int IRQPin, int SSPin, int LEDPin, int LEDGNDPin, int RelayPin)
+BM019::BM019(int IRQPin, int SSPin, int LEDPin, int LEDGNDPin, int RelayPin, bool DebugSensor)
 {
    _IRQPin = IRQPin;
    _SSPin = SSPin;
    _LEDPin = LEDPin;
    _RelayPin = RelayPin;
    _LEDGNDPin = LEDGNDPin;
-   
+
+   //turn off serial output
+   _DebugSensor = DebugSensor;
 }
 
 
@@ -41,8 +43,9 @@ void BM019::Begin(){
     delayMicroseconds(100);         // BM019 into SPI
     digitalWrite(_IRQPin, HIGH);     // mode 
     delay(10);
-    Serial.println("begin ended"); 
- 
+
+
+    Serial.println("Begin() BM019 COMPLETED"); 
 }
 
 void BM019::Flash(int times, int on_period){
@@ -62,17 +65,15 @@ void BM019::Initialize()
 {
   byte i = 0;
 
-
+  //setup pins
   pinMode(_RelayPin, OUTPUT);
-
   pinMode(_LEDPin, OUTPUT);
   pinMode(_LEDGNDPin, OUTPUT);
-  
+
+  //set outut pins to ground
   digitalWrite(_LEDPin, LOW);
   digitalWrite(_LEDGNDPin, LOW);
   
-  
-
 // step 1 send the command
   digitalWrite(_SSPin, LOW);
   SPI.transfer(0);  // SPI control byte to send command to CR95HF
@@ -88,10 +89,10 @@ void BM019::Initialize()
   digitalWrite(_SSPin, LOW);
 
   while(RXBuffer[0] != 8)
-    {
+  {
     RXBuffer[0] = SPI.transfer(0x03);  // Write 3 until
     RXBuffer[0] = RXBuffer[0] & 0x08;  // bit 3 is set
-    }
+  }
   digitalWrite(_SSPin, HIGH);
   delay(1);
 
@@ -100,13 +101,16 @@ void BM019::Initialize()
   SPI.transfer(0x02);   // SPI control byte for read         
   RXBuffer[0] = SPI.transfer(0);  // response code
   RXBuffer[1] = SPI.transfer(0);  // length of data
-  for (i=0;i<RXBuffer[1];i++)      
-      RXBuffer[i+2]=SPI.transfer(0);  // data
+  for (i=0;i<RXBuffer[1];i++){
+    RXBuffer[i+2]=SPI.transfer(0);  // data      
+  }
+
   digitalWrite(_SSPin, HIGH);
   delay(1);
 
   if ((RXBuffer[0] == 0) & (RXBuffer[1] == 15))
   {  
+
     Serial.println("IDN COMMAND-");  //
     Serial.print("RESPONSE CODE: ");
     Serial.print(RXBuffer[0]);
@@ -124,15 +128,16 @@ void BM019::Initialize()
     Serial.print(RXBuffer[RXBuffer[1]+1],HEX);
     Serial.println(" ");
 
+
     Flash(4,100);
   
   }
   else{
     Serial.println("BAD RESPONSE TO IDN COMMAND!");
+    
     Flash(8,500);
   }
 
-  Serial.println(" ");
 }
 
 /* SetProtocol_Command programs the CR95HF for
@@ -147,10 +152,10 @@ If the correct response is received the serial monitor is used
 to display successful programming. 
 */
 void BM019::SetProtocol()
- {
- byte i = 0;
+{
+   byte i = 0;
  
-// step 1 send the command
+  // step 1 send the command
   digitalWrite(_SSPin, LOW);
   SPI.transfer(0x00);  // SPI control byte to send command to CR95HF
   SPI.transfer(0x02);  // Set protocol command
@@ -160,18 +165,17 @@ void BM019::SetProtocol()
   digitalWrite(_SSPin, HIGH);
   delay(1);
  
-// step 2, poll for data ready
-
+  // step 2, poll for data ready
   digitalWrite(_SSPin, LOW);
   while(RXBuffer[0] != 8)
-    {
+  {
     RXBuffer[0] = SPI.transfer(0x03);  // Write 3 until
     RXBuffer[0] = RXBuffer[0] & 0x08;  // bit 3 is set
-    }
+  }
   digitalWrite(_SSPin, HIGH);
   delay(1);
 
-// step 3, read the data
+  // step 3, read the data
   digitalWrite(_SSPin, LOW);
   SPI.transfer(0x02);   // SPI control byte for read         
   RXBuffer[0] = SPI.transfer(0);  // response code
@@ -181,18 +185,19 @@ void BM019::SetProtocol()
   if ((RXBuffer[0] == 0) & (RXBuffer[1] == 0))
   {
      Serial.println("PROTOCOL SET-");  //
+
      NFCReady = 1; // NFC is ready
      Flash(2,500);
   }
   else
   {
      Serial.println("BAD RESPONSE TO SET PROTOCOL");
+
      NFCReady = 0; // NFC not ready
 
      Flash(1,3000);
      
   }
-  Serial.println(" ");
 }
 
 /* Inventory_Command chekcs to see if an RF
@@ -224,7 +229,6 @@ void BM019::CheckForTag()
 // step 2, poll for data ready
 // data is ready when a read byte
 // has bit 3 set (ex:  B'0000 1000')
-
   digitalWrite(_SSPin, LOW);
   while(RXBuffer[0] != 8)
   {
@@ -247,7 +251,9 @@ void BM019::CheckForTag()
 
   if (RXBuffer[0] == 128)
   {  
-    Serial.println("TAG DETECTED");
+    if(_DebugSensor){
+        Serial.println("TAG DETECTED");
+    }
 
     /*
     Serial.print("UID: ");
@@ -257,18 +263,19 @@ void BM019::CheckForTag()
       Serial.print(" ");
     }
     */
-    Serial.println(" ");
+
     digitalWrite(_RelayPin, HIGH);
     digitalWrite(_LEDPin, HIGH);
   }
   else
-    {
-    Serial.print("NO TAG IN RANGE");
+  {
+    if(_DebugSensor){
+      Serial.print("NO TAG IN RANGE");
+    }
     //Serial.print("RESPONSE CODE: ");
     //Serial.println(RXBuffer[0],HEX);
     digitalWrite(_RelayPin, LOW);
     digitalWrite(_LEDPin, LOW);
     
-    }
-  Serial.println(" ");
+  }
 }

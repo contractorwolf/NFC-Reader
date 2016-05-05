@@ -13,7 +13,7 @@
 class BM019
 {
   public:
-    BM019(int IRQPin, int SSPin, int LEDPin, int LEDGNDPin, int RelayPin);
+    BM019(int IRQPin, int SSPin, int LEDPin, int LEDGNDPin, int RelayPin, bool debug);
     void Begin();
     void Initialize();
     void SetProtocol();
@@ -29,6 +29,7 @@ class BM019
     int _RelayPin;         // pin attached to digital relay
     byte TXBuffer[40];    // transmit buffer
     byte RXBuffer[40];    // receive buffer
+    bool _DebugSensor;
 
 };
 
