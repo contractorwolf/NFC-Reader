@@ -135,7 +135,7 @@ void BM019::Initialize()
   else{
     Serial.println("BAD RESPONSE TO IDN COMMAND!");
     
-    Flash(8,500);
+    Flash(6,300);
   }
 
 }
@@ -187,7 +187,8 @@ void BM019::SetProtocol()
      Serial.println("PROTOCOL SET-");  //
 
      NFCReady = 1; // NFC is ready
-     Flash(2,500);
+     Flash(2,300);
+
   }
   else
   {
@@ -195,7 +196,8 @@ void BM019::SetProtocol()
 
      NFCReady = 0; // NFC not ready
 
-     Flash(1,3000);
+     Flash(1,1000);
+
      
   }
 }
@@ -270,7 +272,7 @@ void BM019::CheckForTag()
   else
   {
     if(_DebugSensor){
-      Serial.print("NO TAG IN RANGE");
+      Serial.println("NO TAG IN RANGE");
     }
     //Serial.print("RESPONSE CODE: ");
     //Serial.println(RXBuffer[0],HEX);

@@ -1,5 +1,6 @@
 #include <SPI.h>
 #include "BM019.h"
+#include <avr/wdt.h>
 
 /*
 NFC Communication with the Solutions Cubed, LLC BM019 
@@ -26,9 +27,10 @@ void setup() {
   Serial.begin(9600);
   Serial.println("RFID Reader started");
 
-
-  
+  //start the RFID reader
   reader.Begin();
+
+  wdt_enable(WDTO_8S);
 }
 
 
@@ -38,14 +40,19 @@ void loop() {
   if(reader.NFCReady == 0)
   {
     reader.Initialize();  // reads the CR95HF ID
+    wdt_reset();
     delay(1000);
+    wdt_reset();
     reader.SetProtocol(); // ISO 15693 settings
+    wdt_reset();
     delay(1000);
+    wdt_reset();
   }
   else
   {
     reader.CheckForTag();
     delay(100);    
+    wdt_reset();
   }  
 
 }
